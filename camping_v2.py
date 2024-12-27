@@ -249,8 +249,7 @@ class Reservation(tk.Frame):
         self.adults_entry2.grid(row=6, column=3)
 
         # select acommodation 3
-        self.stay_label3 = ttk.Label(self, text="Accomondation 3:", background='#977C70', foreground="black",
-                                     font=("Times New Roman", 15)).grid(row=7, column=2,padx = 10, pady=15)
+        self.stay_label3 = ttk.Label(self, text="Accomondation 3:", background='#977C70', foreground="black",font=("Times New Roman", 15)).grid(row=7, column=2,padx = 10, pady=15)
         self.stay3 = tk.StringVar()
         self.stay_option3 = ttk.Combobox(self, width=7, textvariable=self.stay3)
         self.stay_option3['values'] = ("tent", "room", "rv")
@@ -284,7 +283,6 @@ class Reservation(tk.Frame):
     def info(self):
         self.info_label = tk.Label(self, text="1) each room can accommodate up to 4 people\n2) children underage deserve a discount\t", font=("Times New Roman", 10),
                                       background='#D8C4B6').grid(row=13, column=5)
-   
 
     def enter_data(self):
 
@@ -301,8 +299,6 @@ class Reservation(tk.Frame):
         else:
             adults1 = int(adults1)
         people1 = children1 + adults1
-
-
 
         children2 = self.children_entry2.get()
         adults2 = self.adults_entry2.get()
@@ -330,7 +326,7 @@ class Reservation(tk.Frame):
         else:
             adults3 = int(adults3)
         people3 = children3 + adults3
-       
+
         # convert %m/%d/%y into %Y-%m-%d
         formatCin = datetime.strptime(self.checkin_entry.get(), "%m/%d/%y")
         checkin = formatCin.strftime("%Y-%m-%d")
@@ -352,33 +348,44 @@ class Reservation(tk.Frame):
         cursor.execute(data_insert_query_kratisi, date_insert_tuple_kratisi)
 
         # fill KRAT_EPILE_YPHR
+        Y001_kostos=0
+        Y002_kostos=0
+        Y003_kostos=0
+
         if (self.P.get()):
             choice = "Y001"
+            #global Y001_kostos
+            Y001_kostos= cursor.execute("Select kostos from YPHRESIA where kwd_yphresias='Y001'").fetchone()[0]
             data_insert_query_yphresia = '''INSERT INTO KRAT_EPILE_YPHR VALUES(?,?)'''
             date_insert_tuple_yphresia = (f"KR0{count_kratisi + 1}", f"{choice}",)
             cursor.execute(data_insert_query_yphresia, date_insert_tuple_yphresia)
         if(self.B.get()):
             choice = "Y002"
+            #global Y002_kostos
+            Y002_kostos = cursor.execute("Select kostos from YPHRESIA where kwd_yphresias='Y002'").fetchone()[0]
             data_insert_query_yphresia = '''INSERT INTO KRAT_EPILE_YPHR VALUES(?,?)'''
             date_insert_tuple_yphresia = (f"KR0{count_kratisi + 1}", f"{choice}",)
             cursor.execute(data_insert_query_yphresia, date_insert_tuple_yphresia)
         if(self.E.get()):
             choice = "Y003"
+            #global Y003_kostos
+            Y003_kostos = cursor.execute("Select kostos from YPHRESIA where kwd_yphresias='Y003'").fetchone()[0]
             data_insert_query_yphresia = '''INSERT INTO KRAT_EPILE_YPHR VALUES(?,?)'''
             date_insert_tuple_yphresia = (f"KR0{count_kratisi + 1}", f"{choice}",)
             cursor.execute(data_insert_query_yphresia, date_insert_tuple_yphresia)
-        
 
         dwmatia=cursor.execute('Select kwd_katal,xwrhtikothta FROM DWMATIO ').fetchall()
         rv=cursor.execute('Select kwd_katal,xwrhtikothta FROM RV ').fetchall()
         tents=cursor.execute('Select kwd_katal,xwrhtikothta FROM XWROS_KATASKHNWSHS ').fetchall()
-
+        global a,b,c,d,e,f,g,h,k
+        a, b, c, d, e, f, g, h,k = "","","","","","","","",""
         if (self.stay_option1.get()=='room'):
             for i in dwmatia:
                 if(people1==i[1]):
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    a=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     dwmatia.remove(i)
                     break;
@@ -389,6 +396,7 @@ class Reservation(tk.Frame):
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    b=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     rv.remove(i)
                     break;
@@ -400,17 +408,19 @@ class Reservation(tk.Frame):
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    c=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     tents.remove(i)
                     break;
-            
+
 
         if (self.stay_option2.get()=='room'):
             for i in dwmatia:
                 if(people2==i[1]):
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    d=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     dwmatia.remove(i)
                     break;
@@ -418,9 +428,10 @@ class Reservation(tk.Frame):
         elif (self.stay_option2.get()=='rv'):
             for i in rv:
                 if(people2==i[1]):
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    e=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     rv.remove(i)
                     break;
@@ -429,9 +440,10 @@ class Reservation(tk.Frame):
         elif (self.stay_option2.get()=='tent'):
             for i in tents:
                 if(people2==i[1]):
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    f=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     tents.remove(i)
                     break;
@@ -439,9 +451,10 @@ class Reservation(tk.Frame):
         if (self.stay_option3.get()=='room'):
             for i in dwmatia:
                 if(people3==i[1]):
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    g=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     dwmatia.remove(i)
                     break;
@@ -449,9 +462,10 @@ class Reservation(tk.Frame):
         elif (self.stay_option3.get()=='rv'):
             for i in rv:
                 if(people3==i[1]):
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    h=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     rv.remove(i)
                     break;
@@ -460,12 +474,34 @@ class Reservation(tk.Frame):
         elif (self.stay_option3.get()=='tent'):
             for i in tents:
                 if(people3==i[1]):
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    k=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     tents.remove(i)
                     break;
+        # fill PLHRWMH
+        tDays = (formatCout - formatCin)  # .days
+        Q1= cursor.execute( '''select kostos from DWMATIO where kwd_katal=? UNION select kostos from RV where kwd_katal=? UNION select kostos from XWROS_KATASKHNWSHS where kwd_katal=? ''', (a,b,c,)).fetchone()[0]
+        Q2= cursor.execute( '''select kostos from DWMATIO where kwd_katal=? UNION select kostos from RV where kwd_katal=? UNION select kostos from XWROS_KATASKHNWSHS where kwd_katal=? ''', (d,e,f,)).fetchone()
+        Q3= cursor.execute( '''select kostos from DWMATIO where kwd_katal=? UNION select kostos from RV where kwd_katal=? UNION select kostos from XWROS_KATASKHNWSHS where kwd_katal=? ''', (g,h,k,)).fetchone()
+        if Q2 is None:
+            Q2 = 0
+        else:
+            Q2 = Q2[0]
+        if Q3 is None:
+            Q3 = 0
+        else:
+            Q3 = Q3[0]
+        Accomodations= ( (children1*7+adults1*10)+Q1+(children2*7+adults2*10)+Q2+(children3*7+adults3*10)+Q3)
+        total_cost= Y001_kostos+Y002_kostos+Y003_kostos+(tDays.days)*(Accomodations)
+        print(total_cost)
+
+        count_plhrwmh = cursor.execute("Select count(*) FROM PLHRWMH").fetchone()[0]
+        data_insert_query_plhrwmh = '''INSERT INTO PLHRWMH VALUES(?,?,?,?)'''
+        date_insert_tuple_plhrwmh = (f"P00{count_plhrwmh + 1}",(count+1),f"KR0{count_kratisi + 1}",total_cost )
+        cursor.execute(data_insert_query_plhrwmh, date_insert_tuple_plhrwmh)
 
         conn.commit()
         conn.close()
@@ -500,9 +536,12 @@ class DatabaseRecords(tk.Frame):
             rows = cursor.fetchall()
             columns = [description[0] for description in cursor.description]
 
+            self.tree_scroll = ttk.Scrollbar(frame)
+            self.tree_scroll.pack(side="right", fill="y")
             # Display data in a Treeview
-            tree = ttk.Treeview(frame, columns=columns, show="headings")
+            tree = ttk.Treeview(frame, columns=columns, show="headings",yscrollcommand=self.tree_scroll.set)
             tree.pack(fill="both", expand=True)
+            self.tree_scroll.config(command=tree.yview)
 
             # Set column headings
             for col in columns:
