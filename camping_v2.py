@@ -1,18 +1,15 @@
 import tkinter as tk                
-from tkinter import font as tkfont 
 from tkinter import ttk, PhotoImage, messagebox, Checkbutton
 from tkcalendar import DateEntry
 from datetime import datetime
 import connection
 import sqlite3
-import random
 
 class Welcome(tk.Tk):
 
     def __init__(self):
         tk.Tk.__init__(self)
         self.title('Camping')
-        self.geometry("")
         container = tk.Frame(self,bg='#D8C4B6')
         container.pack( fill="both", expand=True)
 
@@ -28,8 +25,8 @@ class Welcome(tk.Tk):
 
         self.show_frame("Visitor")
 
+    #Show a frame for the given page name
     def show_frame(self, page_name):
-        '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
 
@@ -86,6 +83,8 @@ class Visitor(tk.Frame):
             self.controller.show_frame("Receptionist")
         elif selected == "camper":
             self.controller.show_frame("Camper")
+
+
 class Rating(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent,bg='#D8C4B6')
@@ -113,6 +112,7 @@ class Rating(tk.Frame):
         sxolia=self.comments_text.get(1.0, "end-1c")
         conn=sqlite3.connect('camping_v2.db')
         cursor=conn.cursor()
+
         # fill AXIOLOGHSH
         x=cursor.execute('''Select K.kwd_katask, KR.kwd_krathshs
                 From KATASKHNWTHS as K NATURAL JOIN KRATHSH AS KR 
@@ -180,6 +180,7 @@ class Reservation(tk.Frame):
                                                                                                              column=0)
         self.id_entry = tk.Entry(self)
         self.id_entry.grid(row=6, column=1)
+
         #select checkin checkout dates
         self.checkin_label = tk.Label(self, text="check-in date", font=("Times New Roman", 15), background='#D8C4B6').grid(row=8,
                                                                                                      column=1)
@@ -223,6 +224,7 @@ class Reservation(tk.Frame):
                                                                                                    column=2)
         self.adults_entry1 = tk.Entry(self,width=5)
         self.adults_entry1.grid(row=3, column=3)
+
         #select acommodation 2
         self.stay_label2 = ttk.Label(self, text="Accomondation 2:",background='#D8C4B6', foreground="black",
           font=("Times New Roman", 15)).grid( row=1,column=4)
@@ -240,6 +242,8 @@ class Reservation(tk.Frame):
                                                                                                    column=4)
         self.adults_entry2 = tk.Entry(self,width=5)
         self.adults_entry2.grid(row=3, column=5)
+
+
         #select acommodation 3
         self.stay_label3 = ttk.Label(self, text="Accomondation 3:",background='#D8C4B6', foreground="black",
           font=("Times New Roman", 15)).grid( row=1,column=7)
@@ -257,12 +261,15 @@ class Reservation(tk.Frame):
                                                                                                    column=7)
         self.adults_entry3 = tk.Entry(self,width=5)
         self.adults_entry3.grid(row=3, column=8)
+
+
         #buttons for reservation and switching frames 
         button2 = ttk.Button(self, text="Reserve Now➤", command=self.enter_data).grid(row=10,column=4)
         button = ttk.Button(self, text="Back",
                            command=lambda: controller.show_frame("Visitor")).grid(row=11,column=4)
         button = ttk.Button(self, text="Camper",
                            command=lambda: controller.show_frame("Camper")).grid(row=12,column=4)
+        
         #current date 
         self.ctime = datetime.now().strftime("%Y-%m-%d")
         current_time = tk.Label(self, text=self.ctime,background='#D8C4B6', foreground="black",
@@ -318,6 +325,7 @@ class Reservation(tk.Frame):
 
         conn=sqlite3.connect('camping_v2.db')
         cursor=conn.cursor()
+
         # fill KATASKHNWTHS
         count=cursor.execute("Select count(*) FROM KATASKHNWTHS").fetchone()[0]
         data_insert_query='''INSERT INTO KATASKHNWTHS VALUES(?,?,?,?,?,?)'''
@@ -355,6 +363,7 @@ class Reservation(tk.Frame):
         if (self.stay_option1.get()=='room'):
             for i in dwmatia:
                 if(people1==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -365,6 +374,7 @@ class Reservation(tk.Frame):
         elif (self.stay_option1.get()=='rv'):
             for i in rv:
                 if(people1==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -376,6 +386,7 @@ class Reservation(tk.Frame):
         elif (self.stay_option1.get()=='tent'):
             for i in tents:
                 if(people1==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -387,6 +398,7 @@ class Reservation(tk.Frame):
         if (self.stay_option2.get()=='room'):
             for i in dwmatia:
                 if(people2==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -397,6 +409,7 @@ class Reservation(tk.Frame):
         elif (self.stay_option2.get()=='rv'):
             for i in rv:
                 if(people2==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -408,6 +421,7 @@ class Reservation(tk.Frame):
         elif (self.stay_option2.get()=='tent'):
             for i in tents:
                 if(people2==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -418,6 +432,7 @@ class Reservation(tk.Frame):
         if (self.stay_option3.get()=='room'):
             for i in dwmatia:
                 if(people3==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -428,6 +443,7 @@ class Reservation(tk.Frame):
         elif (self.stay_option3.get()=='rv'):
             for i in rv:
                 if(people3==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -439,6 +455,7 @@ class Reservation(tk.Frame):
         elif (self.stay_option3.get()=='tent'):
             for i in tents:
                 if(people3==i[1]):
+
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
@@ -550,6 +567,7 @@ class ReceptionistData(tk.Frame):
                 if(r4[0]==r[0]): AVGrating=AVGrating + r4[1]
             profit = tk.Label(self, text=AVGrating,background='#D8C4B6',font=("Times New Roman", 15))
             profit.grid(row=index+ 1,column=9)
+        
         button = ttk.Button(self, text="Back",command=lambda: controller.show_frame("Visitor")).grid()
 
 class ChoseReceptionOptions(tk.Frame):
@@ -583,6 +601,8 @@ class Receptionist(tk.Frame):
             self.controller.show_frame("ChoseReceptionOptions")
 
         else: message = tk.messagebox.showerror(title="WRONG PASSWORD", message="try again")
+
+
 
 if __name__ == "__main__":
     app = Welcome()
