@@ -284,25 +284,7 @@ class Reservation(tk.Frame):
     def info(self):
         self.info_label = tk.Label(self, text="1) each room can accommodate up to 4 people\n2) children underage deserve a discount\t", font=("Times New Roman", 10),
                                       background='#D8C4B6').grid(row=13, column=5)
-    # def accomodation(self, i,j):
-    #     self.stay_label1 = ttk.Label(self, text=f"Accomondation {j}:", background='#997C70', foreground="black",
-    #                                  font=("Times New Roman", 15)).grid(row=i, column=2,padx = 10, pady=15)
-    #     self.stay = tk.StringVar()
-    #     self.stay_option = ttk.Combobox(self, width=7, textvariable=self.stay)
-    #     self.stay_option['values'] = ("tent", "room", "rv")
-    #     self.stay_option.grid(row=i, column= 3)
-    #
-    #     self.children_label = tk.Label(self, text="children number", font=("Times New Roman", 15),
-    #                                    background='#D8C4B6').grid(row=i+1,
-    #                                                               column=2)
-    #     self.children_entry = tk.Entry(self, width=5)
-    #     self.children_entry.grid(row=i+1, column=3)
-    #
-    #     self.adults_label = tk.Label(self, text="adults number", font=("Times New Roman", 15),
-    #                                  background='#D8C4B6').grid(row=i+2,
-    #                                                             column=2)
-    #     self.adults_entry = tk.Entry(self, width=5)
-    #     self.adults_entry.grid(row=i+2, column=3)
+   
 
     def enter_data(self):
 
@@ -492,6 +474,9 @@ class DatabaseRecords(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent, bg='#D8C4B6')
         self.controller = controller
+        # Add a back button
+
+
         conn = sqlite3.connect('camping_v5.db')
         cursor = conn.cursor()
         cursor = conn.cursor()
@@ -502,7 +487,8 @@ class DatabaseRecords(tk.Frame):
         tables = [table[0] for table in cursor.fetchall()]
         notebook = ttk.Notebook(self)
         notebook.pack(fill="both", expand=True)
-
+        back_button = ttk.Button(self, text="Back", command=lambda: controller.show_frame("Visitor"))
+        back_button.pack()
 
         for table in tables:
             # Create a frame for each table
@@ -517,7 +503,6 @@ class DatabaseRecords(tk.Frame):
             # Display data in a Treeview
             tree = ttk.Treeview(frame, columns=columns, show="headings")
             tree.pack(fill="both", expand=True)
-            #tree.tag_configure("even",background='#D8C4B6', foreground="black",font=("Times New Roman", 15))
 
             # Set column headings
             for col in columns:
@@ -528,7 +513,9 @@ class DatabaseRecords(tk.Frame):
             for row in rows:
                 tree.insert("", "end", values=row)
 
-                # Close the database connection
+
+
+        # Close the database connection
         conn.commit()
         conn.close()
 
@@ -582,7 +569,6 @@ class ReceptionistData(tk.Frame):
         # Place the treeview in the grid
         self.tree.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
-        # Add a back button
         back_button = ttk.Button(self, text="Back", command=lambda: controller.show_frame("Visitor"))
         back_button.grid(row=1, column=0, pady=10)
 
