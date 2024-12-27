@@ -588,9 +588,9 @@ class Receptionist(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent,bg='#D8C4B6')
         self.controller = controller
-        code = tk.Label(self, text="enter code number",
+        code = tk.Label(self, text="enter password ",
             font=("Times New Roman", 15),background='#D8C4B6').pack(pady=10)
-        self.e1= tk.Entry(self)
+        self.e1= tk.Entry(self,show="*",width=10)
         self.e1.pack()
         button1 = ttk.Button(self, text="continue➤", command=self.check_password).pack(pady=10)
         button = ttk.Button(self, text="Back",
