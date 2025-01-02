@@ -1,15 +1,18 @@
 import tkinter as tk                
+from tkinter import font as tkfont 
 from tkinter import ttk, PhotoImage, messagebox, Checkbutton
 from tkcalendar import DateEntry
 from datetime import datetime
 import connection
 import sqlite3
+import random
 
 class Welcome(tk.Tk):
 
     def __init__(self):
         tk.Tk.__init__(self)
         self.title('Camping')
+        self.geometry("")
         container = tk.Frame(self,bg='#D8C4B6')
         container.pack( fill="both", expand=True)
 
@@ -23,25 +26,28 @@ class Welcome(tk.Tk):
             self.frames[page_name] = frame
             frame.grid(row=0,column=0,sticky="nsew")
 
+
         self.show_frame("Visitor")
 
-    #Show a frame for the given page name
     def show_frame(self, page_name):
+        '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
 
 
 class StarRating(tk.Frame):
-    def __init__(self, parent, num_stars=5, **kwargs):
-        super().__init__(parent, **kwargs)
+    def __init__(self, parent,controller, num_stars=5, **kwargs):
+        tk.Frame.__init__(self, parent,bg='#D8C4B6')
+
+        self.controller = controller
         self.num_stars = num_stars
         self.rating = 0  # Current rating (number of stars selected)
         self.stars = []  # List to hold the star widgets
 
         # Create the star buttons
         for i in range(1, num_stars + 1):
-            star = tk.Label(self, text="☆", font=("Times New Roman", 24), fg="gray", cursor="hand2")
-            star.grid(row=0, column=i - 1, padx=5)
+            star = tk.Label(self, text="★", font=("Times New Roman", 24),background="#D8C4B6", fg="#EFF3EA", cursor="hand2")
+            star.grid(row=0, column=i - 1)
             star.bind("<Enter>", lambda e, idx=i: self.highlight(idx))
             star.bind("<Leave>", lambda e: self.highlight(self.rating))
             star.bind("<Button-1>", lambda e, idx=i: self.set_rating(idx))
@@ -50,7 +56,7 @@ class StarRating(tk.Frame):
     def highlight(self, num_stars):
         """Highlight stars up to the given number."""
         for idx, star in enumerate(self.stars):
-            star.config(fg="#FFC94A" if idx < num_stars else "gray")
+            star.config(fg="#FFC94A" if idx < num_stars else "#EFF3EA")
 
     def set_rating(self, num_stars):
         """Set the rating and update the star colors."""
@@ -83,36 +89,33 @@ class Visitor(tk.Frame):
             self.controller.show_frame("Receptionist")
         elif selected == "camper":
             self.controller.show_frame("Camper")
-
-
 class Rating(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent,bg='#D8C4B6')
         self.controller = controller
-        self.axiologhsh = tk.Label(self, text=" Want to rate our Camping? ", background='#A59D84', foreground="black",
-                                font=("Times New Roman", 15)).grid(row=1,column=5)
+        self.axiologhsh = tk.Label(self, text=" Want to rate our Camping? ", background='#977C70', foreground="black",
+                                font=("Times New Roman", 15)).grid(row=0,column=2)
         email_label = tk.Label(self, text="email", font=("Times New Roman", 15), background='#D8C4B6').grid(row=1,
-                                                                                                          column=8)
+                                                                                                          column=1)
         self.email_entry = tk.Entry(self)
-        self.email_entry.grid(row=1, column=9)
-        self.star_rating = StarRating(self, num_stars=5)
-        self.star_rating.grid(row=2,column=5)
-        comments_label = tk.Label(self, text="Comments", font=("Times New Roman", 15), background='#D8C4B6').grid(row=4,
-                                                                                                          column=5)
-        self.comments_text = tk.Text(self,height=2,width=20)
-        self.comments_text.grid(row=4, column=6)
+        self.email_entry.grid(row=1, column=2)
+        self.star_rating = StarRating(self, controller)
+        self.star_rating.grid(row=3,column=2)
+        comments_label = tk.Label(self, text="Add a Review!", font=("Times New Roman", 15), background='#D8C4B6').grid(row=4,
+                                                                                                          column=2)
+        self.comments_text = tk.Text(self,height=5,width=20)
+        self.comments_text.grid(row=5, column=2)
 
-        button = ttk.Button(self, text="Rating Now➤", command=self.save_rating).grid(row=4,column=7)
+        button = ttk.Button(self, text="Rating Now➤", command=self.save_rating).grid(row=6,column=3)
         button = ttk.Button(self, text="Camper",
-                command=lambda: controller.show_frame("Camper")).grid(row=5, column=5)
+                command=lambda: controller.show_frame("Camper")).grid(row=7, column=3)
         
     def save_rating(self):
         email=self.email_entry.get()
         vathmologia=self.star_rating.rating
         sxolia=self.comments_text.get(1.0, "end-1c")
-        conn=sqlite3.connect('camping_v2.db')
+        conn=sqlite3.connect('camping_v5.db')
         cursor=conn.cursor()
-
         # fill AXIOLOGHSH
         x=cursor.execute('''Select K.kwd_katask, KR.kwd_krathshs
                 From KATASKHNWTHS as K NATURAL JOIN KRATHSH AS KR 
@@ -180,23 +183,22 @@ class Reservation(tk.Frame):
                                                                                                              column=0)
         self.id_entry = tk.Entry(self)
         self.id_entry.grid(row=6, column=1)
-
         #select checkin checkout dates
         self.checkin_label = tk.Label(self, text="check-in date", font=("Times New Roman", 15), background='#D8C4B6').grid(row=8,
-                                                                                                     column=1)
+                                                                                                     column=0)
         self.checkin_entry = DateEntry(self)
-        self.checkin_entry.grid(row=8, column=2)
+        self.checkin_entry.grid(row=8, column=1)
 
         self.checkout_label = tk.Label(self, text="check-out date", font=("Times New Roman", 15), background='#D8C4B6').grid(row=9,
-                                                                                                     column=1)
+                                                                                                     column=0)
         self.checkout_entry = DateEntry(self)
-        self.checkout_entry.grid(row=9, column=2)
+        self.checkout_entry.grid(row=9, column=1)
 
         #select service menu button
         self.yphresia_label = ttk.Label(self, text="Select service:",background='#D8C4B6', foreground="black",
-          font=("Times New Roman", 15)).grid( row=7,column=1)
+          font=("Times New Roman", 15)).grid( row=7,column=0)
         mb= tk.Menubutton ( self, text="Service" )
-        mb.grid(row=7, column=2)
+        mb.grid(row=7, column=1)
         mb.menu  =  tk.Menu ( mb, tearoff = 0 )
         mb["menu"]  =  mb.menu
         self.P = tk.IntVar()
@@ -206,62 +208,64 @@ class Reservation(tk.Frame):
         mb.menu.add_checkbutton ( label="Parking", variable=self.P)
         mb.menu.add_checkbutton ( label="Breakfast", variable=self.B)
         mb.menu.add_checkbutton ( label="Electricity supply", variable=self.E)
-
         # select accomodation 1
-        self.stay_label1 = ttk.Label(self, text="Accomondation 1:",background='#D8C4B6', foreground="black",
-          font=("Times New Roman", 15)).grid( row=1,column=2)
+        self.stay_label1 = ttk.Label(self, text="Accomondation 1＊:",background='#977C70', foreground="black",
+                                     font=("Times New Roman", 15)).grid(row=1, column=2,padx = 10, pady=15)
         self.stay1 = tk.StringVar()
         self.stay_option1 = ttk.Combobox(self, width=7, textvariable=self.stay1)
         self.stay_option1['values'] = ("tent", "room", "rv")
         self.stay_option1.grid(row=1, column=3)
 
-        self.children_label1 = tk.Label(self, text="children number", font=("Times New Roman", 15), background='#D8C4B6').grid(row=2,
-                                                                                                     column=2)
-        self.children_entry1 = tk.Entry(self,width=5)
+        self.children_label1 = tk.Label(self, text="children number＊", font=("Times New Roman", 15),
+                                        background='#D8C4B6').grid(row=2,
+                                                                   column=2)
+        self.children_entry1 = tk.Entry(self, width=5)
         self.children_entry1.grid(row=2, column=3)
 
-        self.adults_label1 = tk.Label(self, text="adults number", font=("Times New Roman", 15), background='#D8C4B6').grid(row=3,
-                                                                                                   column=2)
-        self.adults_entry1 = tk.Entry(self,width=5)
+        self.adults_label1 = tk.Label(self, text="adults number", font=("Times New Roman", 15),
+                                      background='#D8C4B6').grid(row=3,
+                                                                 column=2)
+        self.adults_entry1 = tk.Entry(self, width=5)
         self.adults_entry1.grid(row=3, column=3)
 
-        #select acommodation 2
-        self.stay_label2 = ttk.Label(self, text="Accomondation 2:",background='#D8C4B6', foreground="black",
-          font=("Times New Roman", 15)).grid( row=1,column=4)
+        # select acommodation 2
+        self.stay_label2 = ttk.Label(self, text="Accomondation 2:", background='#977C70', foreground="black",
+                                     font=("Times New Roman", 15)).grid(row=4, column=2,padx = 10, pady=15)
         self.stay2 = tk.StringVar()
         self.stay_option2 = ttk.Combobox(self, width=7, textvariable=self.stay2)
         self.stay_option2['values'] = ("tent", "room", "rv")
-        self.stay_option2.grid(row=1, column=5)
+        self.stay_option2.grid(row=4, column=3)
 
-        self.children_label2 = tk.Label(self, text="children number", font=("Times New Roman", 15), background='#D8C4B6').grid(row=2,
-                                                                                                     column=4)
-        self.children_entry2 = tk.Entry(self,width=5)
-        self.children_entry2.grid(row=2, column=5)
+        self.children_label2 = tk.Label(self, text="children number", font=("Times New Roman", 15),
+                                        background='#D8C4B6').grid(row=5,
+                                                                   column=2)
+        self.children_entry2 = tk.Entry(self, width=5)
+        self.children_entry2.grid(row=5, column=3)
 
-        self.adults_label2 = tk.Label(self, text="adults number", font=("Times New Roman", 15), background='#D8C4B6').grid(row=3,
-                                                                                                   column=4)
-        self.adults_entry2 = tk.Entry(self,width=5)
-        self.adults_entry2.grid(row=3, column=5)
+        self.adults_label2 = tk.Label(self, text="adults number", font=("Times New Roman", 15),
+                                      background='#D8C4B6').grid(row=6,
+                                                                 column=2)
+        self.adults_entry2 = tk.Entry(self, width=5)
+        self.adults_entry2.grid(row=6, column=3)
 
-
-        #select acommodation 3
-        self.stay_label3 = ttk.Label(self, text="Accomondation 3:",background='#D8C4B6', foreground="black",
-          font=("Times New Roman", 15)).grid( row=1,column=7)
+        # select acommodation 3
+        self.stay_label3 = ttk.Label(self, text="Accomondation 3:", background='#977C70', foreground="black",font=("Times New Roman", 15)).grid(row=7, column=2,padx = 10, pady=15)
         self.stay3 = tk.StringVar()
         self.stay_option3 = ttk.Combobox(self, width=7, textvariable=self.stay3)
         self.stay_option3['values'] = ("tent", "room", "rv")
-        self.stay_option3.grid(row=1, column=8)
+        self.stay_option3.grid(row=7, column=3)
 
-        self.children_label3 = tk.Label(self, text="children number", font=("Times New Roman", 15), background='#D8C4B6').grid(row=2,
-                                                                                                     column=7)
-        self.children_entry3 = tk.Entry(self,width=5)
-        self.children_entry3.grid(row=2, column=8)
+        self.children_label3 = tk.Label(self, text="children number", font=("Times New Roman", 15),
+                                        background='#D8C4B6').grid(row=8,
+                                                                   column=2)
+        self.children_entry3 = tk.Entry(self, width=5)
+        self.children_entry3.grid(row=8, column=3)
 
-        self.adults_label3 = tk.Label(self, text="adults number", font=("Times New Roman", 15), background='#D8C4B6').grid(row=3,
-                                                                                                   column=7)
-        self.adults_entry3 = tk.Entry(self,width=5)
-        self.adults_entry3.grid(row=3, column=8)
-
+        self.adults_label3 = tk.Label(self, text="adults number", font=("Times New Roman", 15),
+                                      background='#D8C4B6').grid(row=9,
+                                                                 column=2)
+        self.adults_entry3 = tk.Entry(self, width=5)
+        self.adults_entry3.grid(row=9, column=3)
 
         #buttons for reservation and switching frames 
         button2 = ttk.Button(self, text="Reserve Now➤", command=self.enter_data).grid(row=10,column=4)
@@ -269,15 +273,21 @@ class Reservation(tk.Frame):
                            command=lambda: controller.show_frame("Visitor")).grid(row=11,column=4)
         button = ttk.Button(self, text="Camper",
                            command=lambda: controller.show_frame("Camper")).grid(row=12,column=4)
-        
-        #current date 
+        info_button = ttk.Button(self, text="𝓲＊",
+                            command=self.info,width=3).grid(row=13, column=5)
+
         self.ctime = datetime.now().strftime("%Y-%m-%d")
         current_time = tk.Label(self, text=self.ctime,background='#D8C4B6', foreground="black",
           font=("Times New Roman", 15))
         current_time.place(anchor="sw", relx=0, rely=1)
-                                                                                                
+    def info(self):
+        self.info_label = tk.Label(self, text="1) each room can accommodate up to 4 people\n2) children underage deserve a discount\t", font=("Times New Roman", 10),
+                                      background='#D8C4B6').grid(row=13, column=5)
+
     def enter_data(self):
+
         children1 = self.children_entry1.get()
+        print(children1)
         adults1 = self.adults_entry1.get()
         if not children1.strip():
             children1 = 0
@@ -289,7 +299,7 @@ class Reservation(tk.Frame):
         else:
             adults1 = int(adults1)
         people1 = children1 + adults1
-      
+
         children2 = self.children_entry2.get()
         adults2 = self.adults_entry2.get()
         if not children2.strip():
@@ -316,16 +326,15 @@ class Reservation(tk.Frame):
         else:
             adults3 = int(adults3)
         people3 = children3 + adults3
-       
+
         # convert %m/%d/%y into %Y-%m-%d
         formatCin = datetime.strptime(self.checkin_entry.get(), "%m/%d/%y")
         checkin = formatCin.strftime("%Y-%m-%d")
         formatCout = datetime.strptime(self.checkout_entry.get(), "%m/%d/%y")
         checkout = formatCout.strftime("%Y-%m-%d")
 
-        conn=sqlite3.connect('camping_v2.db')
+        conn=sqlite3.connect('camping_v5.db')
         cursor=conn.cursor()
-
         # fill KATASKHNWTHS
         count=cursor.execute("Select count(*) FROM KATASKHNWTHS").fetchone()[0]
         data_insert_query='''INSERT INTO KATASKHNWTHS VALUES(?,?,?,?,?,?)'''
@@ -339,34 +348,44 @@ class Reservation(tk.Frame):
         cursor.execute(data_insert_query_kratisi, date_insert_tuple_kratisi)
 
         # fill KRAT_EPILE_YPHR
+        Y001_kostos=0
+        Y002_kostos=0
+        Y003_kostos=0
+
         if (self.P.get()):
             choice = "Y001"
+            #global Y001_kostos
+            Y001_kostos= cursor.execute("Select kostos from YPHRESIA where kwd_yphresias='Y001'").fetchone()[0]
             data_insert_query_yphresia = '''INSERT INTO KRAT_EPILE_YPHR VALUES(?,?)'''
             date_insert_tuple_yphresia = (f"KR0{count_kratisi + 1}", f"{choice}",)
             cursor.execute(data_insert_query_yphresia, date_insert_tuple_yphresia)
         if(self.B.get()):
             choice = "Y002"
+            #global Y002_kostos
+            Y002_kostos = cursor.execute("Select kostos from YPHRESIA where kwd_yphresias='Y002'").fetchone()[0]
             data_insert_query_yphresia = '''INSERT INTO KRAT_EPILE_YPHR VALUES(?,?)'''
             date_insert_tuple_yphresia = (f"KR0{count_kratisi + 1}", f"{choice}",)
             cursor.execute(data_insert_query_yphresia, date_insert_tuple_yphresia)
         if(self.E.get()):
             choice = "Y003"
+            #global Y003_kostos
+            Y003_kostos = cursor.execute("Select kostos from YPHRESIA where kwd_yphresias='Y003'").fetchone()[0]
             data_insert_query_yphresia = '''INSERT INTO KRAT_EPILE_YPHR VALUES(?,?)'''
             date_insert_tuple_yphresia = (f"KR0{count_kratisi + 1}", f"{choice}",)
             cursor.execute(data_insert_query_yphresia, date_insert_tuple_yphresia)
-        
 
         dwmatia=cursor.execute('Select kwd_katal,xwrhtikothta FROM DWMATIO ').fetchall()
         rv=cursor.execute('Select kwd_katal,xwrhtikothta FROM RV ').fetchall()
         tents=cursor.execute('Select kwd_katal,xwrhtikothta FROM XWROS_KATASKHNWSHS ').fetchall()
-
+        global a,b,c,d,e,f,g,h,k
+        a, b, c, d, e, f, g, h,k = "","","","","","","","",""
         if (self.stay_option1.get()=='room'):
             for i in dwmatia:
                 if(people1==i[1]):
-
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    a=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     dwmatia.remove(i)
                     break;
@@ -374,10 +393,10 @@ class Reservation(tk.Frame):
         elif (self.stay_option1.get()=='rv'):
             for i in rv:
                 if(people1==i[1]):
-
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    b=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     rv.remove(i)
                     break;
@@ -386,22 +405,22 @@ class Reservation(tk.Frame):
         elif (self.stay_option1.get()=='tent'):
             for i in tents:
                 if(people1==i[1]):
-
             # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    c=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     tents.remove(i)
                     break;
-            
+
 
         if (self.stay_option2.get()=='room'):
             for i in dwmatia:
                 if(people2==i[1]):
-
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    d=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     dwmatia.remove(i)
                     break;
@@ -409,10 +428,10 @@ class Reservation(tk.Frame):
         elif (self.stay_option2.get()=='rv'):
             for i in rv:
                 if(people2==i[1]):
-
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    e=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     rv.remove(i)
                     break;
@@ -421,10 +440,10 @@ class Reservation(tk.Frame):
         elif (self.stay_option2.get()=='tent'):
             for i in tents:
                 if(people2==i[1]):
-
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    f=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     tents.remove(i)
                     break;
@@ -432,10 +451,10 @@ class Reservation(tk.Frame):
         if (self.stay_option3.get()=='room'):
             for i in dwmatia:
                 if(people3==i[1]):
-
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    g=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     dwmatia.remove(i)
                     break;
@@ -443,10 +462,10 @@ class Reservation(tk.Frame):
         elif (self.stay_option3.get()=='rv'):
             for i in rv:
                 if(people3==i[1]):
-
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    h=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     rv.remove(i)
                     break;
@@ -455,13 +474,34 @@ class Reservation(tk.Frame):
         elif (self.stay_option3.get()=='tent'):
             for i in tents:
                 if(people3==i[1]):
-
-            # fill KRAT_PERILAMB_KATALYM
+                    # fill KRAT_PERILAMB_KATALYM
                     data_insert_query_krat_peril_katal = '''INSERT INTO KRAT_PERILAMB_KATALYM VALUES(?,?)'''
                     date_insert_tuple_krat_peril_katal =(f"KR0{count_kratisi+1}",i[0])
+                    k=i[0]
                     cursor.execute(data_insert_query_krat_peril_katal, date_insert_tuple_krat_peril_katal)
                     tents.remove(i)
                     break;
+        # fill PLHRWMH
+        tDays = (formatCout - formatCin)  # .days
+        Q1= cursor.execute( '''select kostos from DWMATIO where kwd_katal=? UNION select kostos from RV where kwd_katal=? UNION select kostos from XWROS_KATASKHNWSHS where kwd_katal=? ''', (a,b,c,)).fetchone()[0]
+        Q2= cursor.execute( '''select kostos from DWMATIO where kwd_katal=? UNION select kostos from RV where kwd_katal=? UNION select kostos from XWROS_KATASKHNWSHS where kwd_katal=? ''', (d,e,f,)).fetchone()
+        Q3= cursor.execute( '''select kostos from DWMATIO where kwd_katal=? UNION select kostos from RV where kwd_katal=? UNION select kostos from XWROS_KATASKHNWSHS where kwd_katal=? ''', (g,h,k,)).fetchone()
+        if Q2 is None:
+            Q2 = 0
+        else:
+            Q2 = Q2[0]
+        if Q3 is None:
+            Q3 = 0
+        else:
+            Q3 = Q3[0]
+        Accomodations= ( (children1*7+adults1*10)+Q1+(children2*7+adults2*10)+Q2+(children3*7+adults3*10)+Q3)
+        total_cost= Y001_kostos+Y002_kostos+Y003_kostos+(tDays.days)*(Accomodations)
+        print(total_cost)
+
+        count_plhrwmh = cursor.execute("Select count(*) FROM PLHRWMH").fetchone()[0]
+        data_insert_query_plhrwmh = '''INSERT INTO PLHRWMH VALUES(?,?,?,?)'''
+        date_insert_tuple_plhrwmh = (f"P00{count_plhrwmh + 1}",(count+1),f"KR0{count_kratisi + 1}",total_cost )
+        cursor.execute(data_insert_query_plhrwmh, date_insert_tuple_plhrwmh)
 
         conn.commit()
         conn.close()
@@ -470,7 +510,11 @@ class DatabaseRecords(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent, bg='#D8C4B6')
         self.controller = controller
-        conn = sqlite3.connect('camping_v2.db')
+        # Add a back button
+
+
+        conn = sqlite3.connect('camping_v5.db')
+        cursor = conn.cursor()
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         # FROM sqlite_master : contains information about all the tables in the database.
@@ -479,7 +523,8 @@ class DatabaseRecords(tk.Frame):
         tables = [table[0] for table in cursor.fetchall()]
         notebook = ttk.Notebook(self)
         notebook.pack(fill="both", expand=True)
-
+        back_button = ttk.Button(self, text="Back", command=lambda: controller.show_frame("Visitor"))
+        back_button.pack()
 
         for table in tables:
             # Create a frame for each table
@@ -491,10 +536,12 @@ class DatabaseRecords(tk.Frame):
             rows = cursor.fetchall()
             columns = [description[0] for description in cursor.description]
 
+            self.tree_scroll = ttk.Scrollbar(frame)
+            self.tree_scroll.pack(side="right", fill="y")
             # Display data in a Treeview
-            tree = ttk.Treeview(frame, columns=columns, show="headings")
+            tree = ttk.Treeview(frame, columns=columns, show="headings",yscrollcommand=self.tree_scroll.set)
             tree.pack(fill="both", expand=True)
-            #tree.tag_configure("even",background='#D8C4B6', foreground="black",font=("Times New Roman", 15))
+            self.tree_scroll.config(command=tree.yview)
 
             # Set column headings
             for col in columns:
@@ -505,7 +552,9 @@ class DatabaseRecords(tk.Frame):
             for row in rows:
                 tree.insert("", "end", values=row)
 
-                # Close the database connection
+
+
+        # Close the database connection
         conn.commit()
         conn.close()
 
@@ -514,61 +563,72 @@ class ReceptionistData(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent,bg='#D8C4B6')
         self.controller = controller
-        mywin0 = tk.Label(self, text="year", background='#D8C4B6', foreground="black",
-                                font=("Times New Roman", 15)).grid(row=0, column=0)
-        mywin1 = tk.Label(self, text="reservations", background='#D8C4B6', foreground="black",
-                                font=("Times New Roman", 15)).grid(row=0, column=1)
-        mywin2 = tk.Label(self, text="profit from TENTS",background='#D8C4B6', foreground="black",
-                                font=("Times New Roman", 15)).grid(row=0, column=3)
-        mywin3 = tk.Label(self, text="profit from ROOMS", background='#D8C4B6', foreground="black",
-                                font=("Times New Roman", 15)).grid(row=0, column=5)
-        mywin4 = tk.Label(self, text="profit from RV", background='#D8C4B6', foreground="black",
-                                font=("Times New Roman", 15)).grid(row=0, column=7)
-        mywin5 = tk.Label(self, text="Total Rating", background='#D8C4B6', foreground="black",
-                          font=("Times New Roman", 15)).grid(row=0, column=9)
 
+        # Create a Treeview (table) with columns
+        self.tree = ttk.Treeview(self, columns=(
+        "Year", "Reservations", "Profit from TENTS", "Profit from ROOMS", "Profit from RV", "Total Rating"),
+                                 show="headings")
+        # Define column headers
+        self.tree.heading("Year", text="Year")
+        self.tree.heading("Reservations", text="Reservations")
+        self.tree.heading("Profit from TENTS", text="Profit from TENTS")
+        self.tree.heading("Profit from ROOMS", text="Profit from ROOMS")
+        self.tree.heading("Profit from RV", text="Profit from RV")
+        self.tree.heading("Total Rating", text="Total Rating")
+
+        # Style Configuration for Header and Rows
+        style = ttk.Style()
+        style.theme_use('clam')
+
+        # Style for the Treeview heading (header)
+        style.configure("Treeview.Heading", background='#997C70', font=("Times New Roman", 10))
+
+        # Set column widths (optional)
+        self.tree.column("Year", width=100, anchor="center")
+        self.tree.column("Reservations", width=100, anchor="center")
+        self.tree.column("Profit from TENTS", width=150, anchor="center")
+        self.tree.column("Profit from ROOMS", width=150, anchor="center")
+        self.tree.column("Profit from RV", width=150, anchor="center")
+        self.tree.column("Total Rating", width=150, anchor="center")
+
+
+        # Style for Treeview rows (records)
+        style.configure("Treeview", background='#D8C4B6', foreground="black",  font=("Times New Roman", 10))
+
+        # Insert data into the Treeview
         for index, r in enumerate(connection.records):
-            count_t=0
-            count_r=0
-            count_rv=0
-            AVGrating=0
-            years = tk.Label(self, text=r[0],background='#D8C4B6',font=("Times New Roman", 15))
-            years.grid(row=index+ 1,column=0)
-            numOfRes = tk.Label(self, text=r[1],background='#D8C4B6',font=("Times New Roman", 15))
-            numOfRes.grid(row=index + 1,column=1)
-            for index1,r1 in enumerate(connection.records1):
-                if (r1[0] == r[0]):
-                    if (r1[2] is None):
-                        r1_list = list(r1)
-                        r1_list[2] = 0
-                        r1 = tuple(r1_list)
-                    count_t = count_t + r1[2]
-            profit = tk.Label(self, text=count_t,background='#D8C4B6',font=("Times New Roman", 15))
-            profit.grid(row=index+ 1,column=3)
-            for index2,r2 in enumerate(connection.records2):
-                if (r2[0] == r[0]):
-                    if (r2[2] is None):
-                        r2_list = list(r2)
-                        r2_list[2] = 0
-                        r2 = tuple(r2_list)
-                    count_r = count_r + r2[2]
-            profit = tk.Label(self, text=count_r,background='#D8C4B6',font=("Times New Roman", 15))
-            profit.grid(row=index+ 1,column=5)
-            for index3,r3 in enumerate(connection.records3):
-                if (r3[0] == r[0]):
-                    if (r3[2] is None):
-                        r3_list = list(r3)
-                        r3_list[2] = 0
-                        r3 = tuple(r3_list)
-                    count_rv = count_rv + r3[2]
-            profit = tk.Label(self, text=count_rv,background='#D8C4B6',font=("Times New Roman", 15))
-            profit.grid(row=index+ 1,column=7)
-            for index4,r4 in enumerate(connection.records4):
-                if(r4[0]==r[0]): AVGrating=AVGrating + r4[1]
-            profit = tk.Label(self, text=AVGrating,background='#D8C4B6',font=("Times New Roman", 15))
-            profit.grid(row=index+ 1,column=9)
-        
-        button = ttk.Button(self, text="Back",command=lambda: controller.show_frame("Visitor")).grid()
+            count_t = self.calculate_profit(connection.records1, r[0])
+            count_r = self.calculate_profit(connection.records2, r[0])
+            count_rv = self.calculate_profit(connection.records3, r[0])
+            AVGrating = self.calculate_avg_rating(connection.records4, r[0])
+
+            # Insert each row into the treeview
+            self.tree.insert("", "end", values=(r[0], r[1], count_t, count_r, count_rv, AVGrating))
+
+        # Place the treeview in the grid
+        self.tree.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        back_button = ttk.Button(self, text="Back", command=lambda: controller.show_frame("Visitor"))
+        back_button.grid(row=1, column=0, pady=10)
+
+    def calculate_profit(self, records, year):
+        total = 0
+        for record in records:
+            if record[0] == year:
+                # Handle None values and sum profits
+                profit = record[2] if record[2] is not None else 0
+                total += profit
+        return total
+
+    def calculate_avg_rating(self, records, year):
+        total_rating = 0
+        count = 0
+        for record in records:
+            if record[0] == year:
+                total_rating += record[1]
+                count += 1
+        return total_rating // count if count > 0 else 0
+
 
 class ChoseReceptionOptions(tk.Frame):
     def __init__(self, parent, controller):
@@ -588,9 +648,9 @@ class Receptionist(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent,bg='#D8C4B6')
         self.controller = controller
-        code = tk.Label(self, text="enter password ",
+        code = tk.Label(self, text="enter code number",
             font=("Times New Roman", 15),background='#D8C4B6').pack(pady=10)
-        self.e1= tk.Entry(self,show="*",width=10)
+        self.e1= tk.Entry(self, show="*", width=10)
         self.e1.pack()
         button1 = ttk.Button(self, text="continue➤", command=self.check_password).pack(pady=10)
         button = ttk.Button(self, text="Back",
@@ -601,8 +661,6 @@ class Receptionist(tk.Frame):
             self.controller.show_frame("ChoseReceptionOptions")
 
         else: message = tk.messagebox.showerror(title="WRONG PASSWORD", message="try again")
-
-
 
 if __name__ == "__main__":
     app = Welcome()
